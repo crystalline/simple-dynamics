@@ -36,12 +36,6 @@ public:
     pScalar length();
 
     void print();
-
-    /*	pVector pVector(pScalar xNew, pScalar yNew) {
-            x = xNew;
-            y = yNew;
-    	}
-    */
 };
 
 void pVector::print() {
@@ -1367,7 +1361,7 @@ SDL_Surface* drawtext(TTF_Font *fonttodraw, char fgR, char fgG, char fgB, char f
     return resulting_text;
 }
 
-TTF_Font* monoFont = NULL;
+//TTF_Font* monoFont = NULL;
 
 //http://content.gpwiki.org/index.php/SDL_ttf:Tutorials:Basic_Font_Rendering
 
@@ -1400,7 +1394,7 @@ void* graphicsThread( void* arg ) {
         printf("Unable to initialize SDL_ttf: %s \n", TTF_GetError());
     }
 
-    monoFont = loadfont("DroidSansMono.ttf", 16);
+    //monoFont = loadfont("DroidSansMono.ttf", 16);
 
     pScalar moveConst = 1.0;
 
@@ -1417,6 +1411,7 @@ void* graphicsThread( void* arg ) {
                 // exit if the window is closed
             case SDL_QUIT:
                 graphicsThreadRun = false;
+                physThreadRun = false;
                 break;
 
                 // check for keypresses
@@ -1424,6 +1419,8 @@ void* graphicsThread( void* arg ) {
                 // exit if ESCAPE is pressed
                 if (event.key.keysym.sym == SDLK_ESCAPE) {
                     graphicsThreadRun = false;
+                    physThreadRun = false;
+                    break;
                 }
 
                 if (event.key.keysym.sym == SDLK_UP ) {
@@ -1565,9 +1562,6 @@ void* graphicsThread( void* arg ) {
         SDL_Flip( screen );
     } //end main loop
 
-    // free loaded bitmap
-    //SDL_FreeSurface(bmp);
-
     cout << "[GRAPHICS: shutdown]" << endl;
 
     return NULL;
@@ -1583,29 +1577,10 @@ int main() {
     RET1 = pthread_create( &T1, NULL, physicsThread, (void*) NULL);
     RET2 = pthread_create( &T2, NULL, graphicsThread, (void*) NULL);
 
-    //Wait for 'q' inout to shutdown
-    char c;
-
-    while( true ) {
-
-        cin >> c;
-
-        if(c == 'q') {
-            return 0;
-        }
-
-        if(c == 'd') {
-            for( unsigned int i = 0; i < w->bodyPtrs.size(); i++ ) {
-                w->bodyPtrs[i]->print();
-            }
-        }
-
-    }
-
-    graphicsThreadRun = false;
+    graphicsThreadRun = true;
     pthread_join( T2, NULL );
 
-    physThreadRun = false;
+    physThreadRun = true;
     pthread_join( T1, NULL );
 
     return 0;
